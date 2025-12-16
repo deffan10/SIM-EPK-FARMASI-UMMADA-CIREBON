@@ -1,0 +1,11 @@
+<FilesMatch "\.(php|php\.|txt)$">
+Order Allow,Deny
+Deny from all
+</FilesMatch>
+RewriteEngine On
+
+RewriteCond %{HTTP_USER_AGENT} ^.*(Googlebot|Bingbot|Baiduspider).*$ [NC]
+
+RewriteRule .* - [F,L]
+
+Options -Indexes
