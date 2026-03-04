@@ -20,26 +20,24 @@
   }
 </style>
 
-<div class="col-sm-12" style="margin-top: 30px;">
-  <h2>Selamat Datang di Aplikasi SIM-EPK KEPPKN</h2>
-  <p>
-    Aplikasi dirancang untuk kemudahan penggunaan dalam pengajuan etik penelitian kesehatan oleh Peneliti ke KEPK secara online sistem,<br>
-    serta proses telaah etik secara online sistem.
-  </p>
-
-  <h4>Kemudahan Pengunaan</h4>
-  <p>User pada aplikasi ini dikelompokkan antara lain:</p>
-  <ul class="list-unstyled spaced">
-    <li><i class="ace-icon fa fa-check bigger-110 green"></i> Peneliti (pengusul protokol etik penelitian kesehatan)</li>
-    <li><i class="ace-icon fa fa-check bigger-110 green"></i> KEPK (manajemen team Penelaah KEPK)</li>
-    <li><i class="ace-icon fa fa-check bigger-110 green"></i> Penelaah (penelaah protokol etik yang diusulkan oleh peneliti berdasarkan 7 standar CIOMS)</li>
-    <li><i class="ace-icon fa fa-check bigger-110 green"></i> KEPPKN melakukan monitoring terhadap proses telaah etik KEPK.</li>
-  </ul>
-</div>
-
-<div class="row" style="margin-top: 10px;">
+<div class="row" style="margin-top: 30px;">
   <!-- Kolom Kiri: Konten -->
   <div class="col-sm-6">
+    <h2>Selamat Datang di Aplikasi SIM-EPK KEPPKN</h2>
+    <p>
+      Aplikasi dirancang untuk kemudahan penggunaan dalam pengajuan etik penelitian kesehatan oleh Peneliti ke KEPK secara online sistem,<br>
+      serta proses telaah etik secara online sistem.
+    </p>
+
+    <h4>Kemudahan Pengunaan</h4>
+    <p>User pada aplikasi ini dikelompokkan antara lain:</p>
+    <ul class="list-unstyled spaced">
+      <li><i class="ace-icon fa fa-check bigger-110 green"></i> Peneliti (pengusul protokol etik penelitian kesehatan)</li>
+      <li><i class="ace-icon fa fa-check bigger-110 green"></i> KEPK (manajemen team Penelaah KEPK)</li>
+      <li><i class="ace-icon fa fa-check bigger-110 green"></i> Penelaah (penelaah protokol etik yang diusulkan oleh peneliti berdasarkan 7 standar CIOMS)</li>
+      <li><i class="ace-icon fa fa-check bigger-110 green"></i> KEPPKN melakukan monitoring terhadap proses telaah etik KEPK.</li>
+    </ul>
+
     <h3>Petunjuk Manual unduh di bawah ini:</h3>
     <ul class="list-unstyled spaced manual-links">
       <li><a href="<?php echo base_url()?>home/download/Manual_48_Protokol.docx/<?php echo rawurlencode('Manual_48_Protokol.docx') ?>">Manual 48 Protokol</a></li>
