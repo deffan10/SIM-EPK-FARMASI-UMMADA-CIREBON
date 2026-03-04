@@ -22,7 +22,10 @@
 
 <div class="col-sm-12" style="margin-top: 30px;">
   <h2>Selamat Datang di Aplikasi SIM-EPK KEPPKN</h2>
-  <p>Aplikasi di rancang untuk kemudahan penggunaan dalam pengajuan etik penelitian kesehatan oleh Peneliti ke KEPK secara online sistem, dan proses telaah etik secara online sistem.</p>
+  <p>
+    Aplikasi dirancang untuk kemudahan penggunaan dalam pengajuan etik penelitian kesehatan oleh Peneliti ke KEPK secara online sistem,<br>
+    serta proses telaah etik secara online sistem.
+  </p>
 
   <h4>Kemudahan Pengunaan</h4>
   <p>User pada aplikasi ini dikelompokkan antara lain:</p>
