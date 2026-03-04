@@ -46,6 +46,12 @@
       <li><a href="<?php echo base_url()?>home/download/INFORM_CONSENT_35_BUTIR.docx/<?php echo rawurlencode('INFORM_CONSENT_35_BUTIR.docx') ?>">Formulir Informed Consent 35 Butir</a></li>
       <li><a href="<?php echo base_url()?>home/download/<?php echo rawurlencode('Manual Registrasi Peneliti SIM-EPK v202501.pdf') ?>/<?php echo rawurlencode('Manual Registrasi Peneliti SIM-EPK v202501.pdf') ?>">Manual Registrasi Peneliti SIM-EPK v202501</a></li>
     </ul>
+    <h3><i class="ace-icon fa fa-phone bigger-120"></i> Chat Kesekretariatan</h3>
+      <div class="alert alert-info" style="border-left: 4px solid #0066cc; margin-top: 15px;">
+        <strong>Kesekretariatan KEPK / KEPPKN</strong><br>
+        <i class="ace-icon fa fa-phone"></i> <strong>Whatsapp (Hanya Chat):</strong> <span style="color: #0066cc; font-size: 16px; font-weight: bold;">0877-2898-7474</span><br>
+        <span style="font-size: 12px; color: #555;">Siap membantu Anda dalam proses pengajuan etik penelitian kesehatan</span>
+      </div>
   </div>
 
   <!-- Kolom Kanan: Alur Pengajuan Gambar -->
@@ -91,16 +97,7 @@
   z-index: 999;
   pointer-events: none;
 ">
-  Hubungi Kami: 0877-2898-7474
-</div>
-
-<hr style="margin: 30px 0;">
-
-<h3><i class="ace-icon fa fa-phone bigger-120"></i> Chat Kesekretariatan</h3>
-<div class="alert alert-info" style="border-left: 4px solid #0066cc; margin-top: 15px;">
-  <strong>Kesekretariatan KEPK / KEPPKN</strong><br>
-  <i class="ace-icon fa fa-phone"></i> <strong>Whatsapp (Hanya Chat):</strong> <span style="color: #0066cc; font-size: 16px; font-weight: bold;">0877-2898-7474</span><br>
-  <span style="font-size: 12px; color: #555;">Siap membantu Anda dalam proses pengajuan etik penelitian kesehatan</span>
+  Kesekretariatan: 0877-2898-7474
 </div>
 
 
