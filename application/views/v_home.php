@@ -40,6 +40,7 @@
 
     <h3>Petunjuk Manual unduh di bawah ini:</h3>
     <ul class="list-unstyled spaced manual-links">
+      <li><a href="https://bit.ly/PanduanEPK" target="_blank">Panduan Pengajuan SIM-EPK</a></li>
       <li><a href="<?php echo base_url()?>home/download/Manual_48_Protokol.docx/<?php echo rawurlencode('Manual_48_Protokol.docx') ?>">Manual 48 Protokol</a></li>
       <li><a href="<?php echo base_url()?>home/download/Check_List_7_Standar_dan_Indikator.pdf/<?php echo rawurlencode('Check_List_7_Standar_dan_Indikator.pdf') ?>">Check List 7 Standar dan Indikator</a></li>
       <li><a href="<?php echo base_url()?>home/download/Formulir_Informed_Consent_WHO.pdf/<?php echo rawurlencode('Formulir_Informed_Consent_WHO.pdf') ?>">Formulir Informed Consent WHO</a></li>
@@ -50,7 +51,7 @@
       <div class="alert alert-info" style="border-left: 4px solid #0066cc; margin-top: 15px;">
         <strong>Kesekretariatan KEPK / KEPPKN</strong><br>
         <i class="ace-icon fa fa-phone"></i> <strong>Whatsapp (Hanya Chat):</strong> <span style="color: #0066cc; font-size: 16px; font-weight: bold;">0877-2898-7474</span><br>
-        <span style="font-size: 12px; color: #555;">Siap membantu Anda dalam proses pengajuan etik penelitian kesehatan</span>
+      <span style="font-size: 12px; color: #555;">Siap membantu Anda dalam proses pengajuan etik penelitian kesehatan</span>
       </div>
   </div>
 
