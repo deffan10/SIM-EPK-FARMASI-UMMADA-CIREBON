@@ -10,6 +10,7 @@
   </h1>
 </div><!-- /.page-header -->
 
+<div class="row" style="margin-top: 30px;">
 <div class="col-sm-12">
   <h2>Selamat Datang di Aplikasi SIM-EPK KEPPKN</h2>
   <p>Aplikasi di rancang untuk kemudahan penggunaan dalam pengajuan etik penelitian kesehatan oleh Peneliti ke KEPK secara online sistem, dan proses telaah etik secara online sistem.</p>
@@ -24,7 +25,7 @@
     </ul>
   </p>
 
-  <div class="row" style="margin-top: 30px;">
+  
     <!-- Kolom Kiri: Konten -->
     <div class="col-sm-6">
       <h3>Petunjuk Manual unduh di bawah ini:</h3>
