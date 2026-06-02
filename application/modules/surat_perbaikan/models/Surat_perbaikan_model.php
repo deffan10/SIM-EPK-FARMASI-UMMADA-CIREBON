@@ -323,7 +323,7 @@ class Surat_perbaikan_model extends Core_Model {
 	{
 		$this->db->select('ap.nama, p.nomor');
 		$this->db->from('tb_anggota_penelitian as ap');
-		$this->db->join('tb_pengusul as p', 'p.id_pengusul = ap.id_pengusul');
+		$this->db->join('tb_pengusul as p', 'p.id_pengusul = ap.id_pengusul', 'left');
 		$this->db->where('ap.id_pengajuan', $id_pengajuan);
 		$result = $this->db->get()->result_array();
 

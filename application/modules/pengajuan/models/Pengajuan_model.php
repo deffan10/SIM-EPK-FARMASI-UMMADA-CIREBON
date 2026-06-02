@@ -165,19 +165,28 @@ class Pengajuan_model extends Core_Model {
 		{
 			for ($i=0; $i<count($this->data_anggota); $i++)
 			{
-				$this->db->select('1')->from('tb_anggota_penelitian')->where('id_ap', $this->data_anggota[$i]['id_ap'])->where('id_pengajuan', $this->id);
-				$rs = $this->db->get()->row_array();
+				$id_ap = $this->data_anggota[$i]['id_ap'];
+
+				if (is_numeric($id_ap) && $id_ap > 0)
+				{
+					$this->db->select('1')->from('tb_anggota_penelitian')->where('id_ap', $id_ap)->where('id_pengajuan', $this->id);
+					$rs = $this->db->get()->row_array();
+				}
+				else
+				{
+					$rs = FALSE;
+				}
 
 				if ($rs)
 				{
 					$this->db->where('id_pengajuan', $this->id);
-					$this->db->where('id_ap', $this->data_anggota[$i]['id_ap']);
+					$this->db->where('id_ap', $id_ap);
 					$this->db->update('tb_anggota_penelitian', $this->data_anggota[$i]);
 					$this->check_trans_status('update tb_anggota_penelitian failed');
 				}
 				else
 				{
-					unset($this->data_anggota['id_ap']);
+					unset($this->data_anggota[$i]['id_ap']);
 					$this->data_anggota[$i]['id_pengajuan'] = $this->id;
 					$this->db->insert('tb_anggota_penelitian', $this->data_anggota[$i]);
 					$this->check_trans_status('insert tb_anggota_penelitian failed');
@@ -199,19 +208,28 @@ class Pengajuan_model extends Core_Model {
     {
   		for ($i=0; $i<count($this->data_pa); $i++)
   		{
-  			$this->db->select('1')->from('tb_peneliti_asing')->where('id_pa', $this->data_pa[$i]['id_pa'])->where('id_pengajuan', $this->id);
-  			$rs = $this->db->get()->row_array();
+				$id_pa = $this->data_pa[$i]['id_pa'];
+
+				if (is_numeric($id_pa) && $id_pa > 0)
+				{
+					$this->db->select('1')->from('tb_peneliti_asing')->where('id_pa', $id_pa)->where('id_pengajuan', $this->id);
+					$rs = $this->db->get()->row_array();
+				}
+				else
+				{
+					$rs = FALSE;
+				}
 
   			if ($rs)
   			{
   				$this->db->where('id_pengajuan', $this->id);
-  				$this->db->where('id_pa', $this->data_pa[$i]['id_pa']);
+  				$this->db->where('id_pa', $id_pa);
   				$this->db->update('tb_peneliti_asing', $this->data_pa[$i]);
   				$this->check_trans_status('update tb_peneliti_asing failed');
   			}
   			else
   			{
-  				unset($this->data_pa['id_pa']);
+  				unset($this->data_pa[$i]['id_pa']);
   				$this->data_pa[$i]['id_pengajuan'] = $this->id;
   				$this->db->insert('tb_peneliti_asing', $this->data_pa[$i]);
   				$this->check_trans_status('insert tb_peneliti_asing failed');
@@ -367,7 +385,7 @@ class Pengajuan_model extends Core_Model {
 	{
 		$this->db->select('ap.*, p.nomor');
 		$this->db->from('tb_anggota_penelitian as ap');
-		$this->db->join('tb_pengusul as p', 'p.id_pengusul = ap.id_pengusul');
+		$this->db->join('tb_pengusul as p', 'p.id_pengusul = ap.id_pengusul', 'left');
 		$this->db->where('ap.id_pengajuan', $id);
 		$result = $this->db->get()->result_array();
 

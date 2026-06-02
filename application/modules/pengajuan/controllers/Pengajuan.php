@@ -142,7 +142,7 @@ class Pengajuan extends Userpage_Controller {
         }
         else 
         {
-          if ($id_pengusul == 0)
+          if (empty($id_pengusul))
           {
             $nomor_failed[] = $nomor;
           }
