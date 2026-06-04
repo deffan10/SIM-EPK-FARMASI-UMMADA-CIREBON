@@ -285,20 +285,10 @@ class Surat_pembebasan extends Userpage_Controller {
       $html .= '<tr><th width="30%"><i>Research Team Members</i></th>
                     <th width="2%"></th>
                     <th></th></tr>';
-    }
-    else
-    {
-      $html .= '<tr><th width="30%"><u>Anggota Peneliti</u></th>
-                    <th width="2%">:</th>
-                    <th><i>Tidak ada anggota peneliti</i></th></tr>';
-      $html .= '<tr><th width="30%"><i>Research Team Members</i></th>
+      $html .= '<tr><th width="30%"></th>
                     <th width="2%"></th>
                     <th></th></tr>';
     }
-    
-    $html .= '<tr><th width="30%"></th>
-                  <th width="2%"></th>
-                  <th></th></tr>';
     $html .= '<tr><th width="30%"><u>Nama Institusi</u></th>
                   <th width="2%">:</th>
                   <th>'.$data_ethical['nama_institusi'].'</th></tr>';
