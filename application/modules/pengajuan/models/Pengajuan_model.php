@@ -273,7 +273,11 @@ class Pengajuan_model extends Core_Model {
 	{
 		$this->db->select('coalesce(p.id_pengusul, 0) as id_pengusul');
 		$this->db->from('tb_pengusul as p');
+		$this->db->join('tb_users as u', 'u.id_pengusul = p.id_pengusul', 'left');
+		$this->db->group_start();
 		$this->db->where('p.nomor', $nomor);
+		$this->db->or_where('u.username', $nomor);
+		$this->db->group_end();
 		$result = $this->db->get()->row_array();
 
 		if ($result)
