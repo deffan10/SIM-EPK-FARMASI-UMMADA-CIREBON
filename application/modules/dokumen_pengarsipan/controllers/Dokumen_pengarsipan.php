@@ -724,6 +724,8 @@ class Dokumen_pengarsipan extends Userpage_Controller {
     $data_ttd = $this->data_model->get_data_ttd_ketua();
     $data_ketua = $this->data_model->get_data_ketua_kepk();
     $data_ethical = $this->data_model->get_data_ethical_exemption_by_id_pep($id_pep);
+    $id_pengajuan = isset($data_ethical['id_pengajuan']) ? $data_ethical['id_pengajuan'] : 0;
+    $data_anggota = $this->data_model->get_anggota_penelitian_by_id_pengajuan($id_pengajuan);
 
     if (isset($data_kop['file_name']) && file_exists('./uploads/'.$data_kop['file_name']))
       $pdf->writeHTMLCell(210, '', 0, 5, '<img src="./uploads/'.$data_kop['file_name'].'">', 0, 1, false, true, 'L', false);
@@ -759,6 +761,30 @@ class Dokumen_pengarsipan extends Userpage_Controller {
     $html .= '<tr><th width="30%"></th>
                   <th width="2%"></th>
                   <th></th></tr>';
+    
+    // Anggota Peneliti
+    if (!empty($data_anggota))
+    {
+      $html .= '<tr><th width="30%"><u>Anggota Peneliti</u></th>
+                    <th width="2%">:</th>
+                    <th>';
+      for ($x=0; $x<count($data_anggota); $x++)
+      {
+        $html .= $data_anggota[$x]['nama'];
+        if ($x == count($data_anggota)-2)
+          $html .= ' dan ';
+        else if ($x < count($data_anggota)-1)
+          $html .= ', ';
+      }
+      $html .= '</th></tr>';
+      $html .= '<tr><th width="30%"><i>Research Team Members</i></th>
+                    <th width="2%"></th>
+                    <th></th></tr>';
+      $html .= '<tr><th width="30%"></th>
+                    <th width="2%"></th>
+                    <th></th></tr>';
+    }
+
     $html .= '<tr><th width="30%"><u>Nama Institusi</u></th>
                   <th width="2%">:</th>
                   <th>'.$data_ethical['nama_institusi'].'</th></tr>';
@@ -847,26 +873,6 @@ class Dokumen_pengarsipan extends Userpage_Controller {
     );
 
     $pdf->write2DBarcode(date('Y-m-d H:i:s').' | '.$data_ethical['no_protokol'].' | '.$data_ketua['nomor'].' | '.$data_ketua['nik'].' | '.$data_ethical['no_dokumen'], 'QRCODE,L', 20, 230, 20, 20, $style, 'N');
-
-    $id_pengajuan = $data_ethical['id_pengajuan'];
-    $data_anggota = $this->data_model->get_anggota_penelitian_by_id_pengajuan($id_pengajuan);
-
-    if (!empty($data_anggota))
-    {
-      $html = '<p>Anggota Peneliti : ';
-      for ($x=0; $x<count($data_anggota); $x++)
-      {
-        $html .= $data_anggota[$x]['nama'];
-
-        if ($x == count($data_anggota)-2)
-          $html .= ' dan ';
-        else if ($x < count($data_anggota)-1)
-          $html .= ', ';
-      }
-      $html .= '</p>';
-
-      $pdf->writeHTMLCell(0, '', '', 260, $html, 0, 0, 0, true, 'L', true);
-    }
 
     // set font
     $pdf->SetFont('times', '', 8);
@@ -991,6 +997,8 @@ class Dokumen_pengarsipan extends Userpage_Controller {
     $data_ttd = $this->data_model->get_data_ttd_ketua();
     $data_ketua = $this->data_model->get_data_ketua_kepk();
     $data_ethical = $this->data_model->get_data_ethical_approval_by_id_pep($id_pep);
+    $id_pengajuan = isset($data_ethical['id_pengajuan']) ? $data_ethical['id_pengajuan'] : 0;
+    $data_anggota = $this->data_model->get_anggota_penelitian_by_id_pengajuan($id_pengajuan);
 
     $id_pep = isset($data_ethical['id_pep']) ? $data_ethical['id_pep'] : 0;
 
@@ -1029,6 +1037,30 @@ class Dokumen_pengarsipan extends Userpage_Controller {
     $html .= '<tr><th width="30%"></th>
                   <th width="2%"></th>
                   <th></th></tr>';
+
+    // Anggota Peneliti
+    if (!empty($data_anggota))
+    {
+      $html .= '<tr><th width="30%"><u>Anggota Peneliti</u></th>
+                    <th width="2%">:</th>
+                    <th>';
+      for ($x=0; $x<count($data_anggota); $x++)
+      {
+        $html .= $data_anggota[$x]['nama'];
+        if ($x == count($data_anggota)-2)
+          $html .= ' dan ';
+        else if ($x < count($data_anggota)-1)
+          $html .= ', ';
+      }
+      $html .= '</th></tr>';
+      $html .= '<tr><th width="30%"><i>Research Team Members</i></th>
+                    <th width="2%"></th>
+                    <th></th></tr>';
+      $html .= '<tr><th width="30%"></th>
+                    <th width="2%"></th>
+                    <th></th></tr>';
+    }
+
     $html .= '<tr><th width="30%"><u>Nama Institusi</u></th>
                   <th width="2%">:</th>
                   <th>'.$data_ethical['nama_institusi'].'</th></tr>';
@@ -1117,26 +1149,6 @@ class Dokumen_pengarsipan extends Userpage_Controller {
     );
 
     $pdf->write2DBarcode(date('Y-m-d H:i:s').' | '.$data_ethical['no_protokol'].' | '.$data_ketua['nomor'].' | '.$data_ketua['nik'].' | '.$data_ethical['no_dokumen'], 'QRCODE,L', 20, 230, 20, 20, $style, 'N');
-
-    $id_pengajuan = $data_ethical['id_pengajuan'];
-    $data_anggota = $this->data_model->get_anggota_penelitian_by_id_pengajuan($id_pengajuan);
-
-    if (!empty($data_anggota))
-    {
-      $html = '<p>Anggota Peneliti : ';
-      for ($x=0; $x<count($data_anggota); $x++)
-      {
-        $html .= $data_anggota[$x]['nama'];
-
-        if ($x == count($data_anggota)-2)
-          $html .= ' dan ';
-        else if ($x < count($data_anggota)-1)
-          $html .= ', ';
-      }
-      $html .= '</p>';
-
-      $pdf->writeHTMLCell(0, '', '', 260, $html, 0, 0, 0, true, 'L', true);
-    }
 
     // set font
     $pdf->SetFont('times', '', 8);
