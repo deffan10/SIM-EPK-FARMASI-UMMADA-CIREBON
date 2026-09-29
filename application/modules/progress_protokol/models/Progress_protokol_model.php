@@ -378,13 +378,26 @@ class Progress_protokol_model extends Core_Model {
 
   function get_data_penelaah_rekap($id_pep)
   {
-    $this->db->select('atk.nomor, atk.nama');
-    $this->db->from('tb_anggota_tim_kepk as atk');
-    $this->db->join('tb_penelaah_mendalam as pm', 'pm.id_atk_penelaah = atk.id_atk');
-    $this->db->join('tb_putusan_awal as pa', 'pa.id_pa = pm.id_pa');
-    $this->db->where('pa.id_pep', $id_pep);
-    $this->db->order_by('atk.nomor', 'asc');
-    $result = $this->db->get()->result_array();
+    $query = "
+      select atk.nomor, atk.nama, atk.id_atk
+      from tb_anggota_tim_kepk as atk
+      join tb_penelaah_mendalam as pm on pm.id_atk_penelaah = atk.id_atk
+      join tb_putusan_awal as pa on pa.id_pa = pm.id_pa
+      where pa.id_pep = ?
+
+      union
+
+      select atk.nomor, atk.nama, atk.id_atk
+      from tb_anggota_tim_kepk as atk
+      join tb_penelaah_awal as pwa on pwa.id_atk_penelaah = atk.id_atk
+      join tb_resume as r on r.id_resume = pwa.id_resume
+      where r.id_pep = ?
+
+      order by nomor asc
+      limit 5
+    ";
+
+    $result = $this->db->query($query, array($id_pep, $id_pep))->result_array();
 
     return $result;
   }
