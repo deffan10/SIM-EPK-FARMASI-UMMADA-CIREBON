@@ -67,4 +67,13 @@
 						<b class="arrow"></b>
 					</li>
 
+					<li class="">
+						<a href="<?php echo base_url()?>progress_protokol/rekap">
+							<i class="menu-icon fa fa-table"></i>
+							<span class="menu-text"> Rekap Pembebasan Etik </span>
+						</a>
+
+						<b class="arrow"></b>
+					</li>
+
 				</ul><!-- /.nav-list -->

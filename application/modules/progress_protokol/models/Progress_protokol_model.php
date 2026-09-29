@@ -335,4 +335,58 @@ class Progress_protokol_model extends Core_Model {
     return $rs['waktu_aktivitas'];
   }
 
+  public function get_data_rekap($bulan_awal, $tahun_awal, $bulan_akhir, $tahun_akhir)
+  {
+    $id_kepk = $this->session->userdata('id_kepk_tim');
+    $start = date('Y-m-d', strtotime($tahun_awal.'-'.$bulan_awal.'-01'));
+    $end = date('Y-m-t', strtotime($tahun_akhir.'-'.$bulan_akhir.'-01'));
+
+    $this->db->select("
+        p.id_pengajuan,
+        p.no_protokol,
+        p.nama_ketua,
+        p.judul,
+        ee.id_pep,
+        ee.tanggal_surat as tgl_disahkan,
+        atk_resume.nama as nama_sekretaris,
+        r.inserted as tgl_acc_sekretaris,
+        coalesce(atk_ketua.nama, atk_wakil_ketua.nama) as nama_ketua_putusan,
+        pa.inserted as tgl_acc_ketua,
+        ksp.inserted as tgl_kirim_peneliti,
+        ksp.id_kirim as sudah_kirim
+      ");
+    $this->db->from('tb_ethical_exemption as ee');
+    $this->db->join('tb_pep as e', 'e.id_pep = ee.id_pep');
+    $this->db->join('tb_pengajuan as p', 'p.id_pengajuan = e.id_pengajuan');
+    $this->db->join('tb_resume as r', 'r.id_pep = e.id_pep', 'left');
+    $this->db->join('tb_anggota_tim_kepk as atk_resume', 'atk_resume.id_atk = r.id_atk_sekretaris', 'left');
+    $this->db->join('tb_putusan_awal as pa', 'pa.id_pep = e.id_pep', 'left');
+    $this->db->join('tb_anggota_tim_kepk as atk_ketua', 'atk_ketua.id_atk = pa.id_atk_ketua', 'left');
+    $this->db->join('tb_anggota_tim_kepk as atk_wakil_ketua', 'atk_wakil_ketua.id_atk = pa.id_atk_wakil_ketua', 'left');
+    $this->db->join('tb_kirim_surat_ke_peneliti as ksp', "ksp.id_pep = e.id_pep and ksp.jenis_surat = 'Pembebasan Etik'", 'left');
+    $this->db->where('p.id_kepk', $id_kepk);
+    $this->db->where("ee.tanggal_surat >= '".$start."' and ee.tanggal_surat <= '".$end."'");
+    $this->db->order_by('ee.tanggal_surat', 'desc');
+    $result = $this->db->get()->result_array();
+
+    foreach ($result as $key => $row) {
+      $result[$key]['penelaah'] = $this->get_data_penelaah_rekap($row['id_pep']);
+    }
+
+    return $result;
+  }
+
+  function get_data_penelaah_rekap($id_pep)
+  {
+    $this->db->select('atk.nomor, atk.nama');
+    $this->db->from('tb_anggota_tim_kepk as atk');
+    $this->db->join('tb_penelaah_mendalam as pm', 'pm.id_atk_penelaah = atk.id_atk');
+    $this->db->join('tb_putusan_awal as pa', 'pa.id_pa = pm.id_pa');
+    $this->db->where('pa.id_pep', $id_pep);
+    $this->db->order_by('atk.nomor', 'asc');
+    $result = $this->db->get()->result_array();
+
+    return $result;
+  }
+
 }

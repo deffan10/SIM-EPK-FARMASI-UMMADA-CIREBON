@@ -49,6 +49,33 @@ class Progress_protokol extends Userpage_Controller {
     $this->load->view('layout/template', $data);
   }
 
+  function rekap()
+  {
+    if ($this->session->userdata('id_group_'.APPAUTH) != 5)
+      show_error('Anda tidak memiliki akses ke halaman ini.');
+
+    $data['title'] = APPNAME.' - Rekap Pembebasan Etik';
+    $data['page_header'] = 'Rekap Pembebasan Etik';
+    $data['breadcrumb'] = 'Rekap Pembebasan Etik';
+
+    $bulan_awal = $this->input->post('bulan_awal') ? $this->input->post('bulan_awal') : date('n');
+    $tahun_awal = $this->input->post('tahun_awal') ? $this->input->post('tahun_awal') : date('Y');
+    $bulan_akhir = $this->input->post('bulan_akhir') ? $this->input->post('bulan_akhir') : date('n');
+    $tahun_akhir = $this->input->post('tahun_akhir') ? $this->input->post('tahun_akhir') : date('Y');
+
+    $data['bulan_awal'] = $bulan_awal;
+    $data['tahun_awal'] = $tahun_awal;
+    $data['bulan_akhir'] = $bulan_akhir;
+    $data['tahun_akhir'] = $tahun_akhir;
+    $data['rekap'] = $this->data_model->get_data_rekap($bulan_awal, $tahun_awal, $bulan_akhir, $tahun_akhir);
+
+    $data['css_content'] = 'rekap_view_css';
+    $data['main_content'] = 'rekap_view';
+    $data['js_content'] = 'rekap_view_js';
+
+    $this->load->view('layout/template', $data);
+  }
+
   function get_daftar()
   {
     $param = array(
