@@ -68,6 +68,7 @@ class Progress_protokol extends Userpage_Controller {
     $data['bulan_akhir'] = $bulan_akhir;
     $data['tahun_akhir'] = $tahun_akhir;
     $data['rekap'] = $this->data_model->get_data_rekap($bulan_awal, $tahun_awal, $bulan_akhir, $tahun_akhir);
+    $data['summary'] = $this->data_model->get_data_summary($data['rekap']);
 
     $data['css_content'] = 'rekap_view_css';
     $data['main_content'] = 'rekap_view';

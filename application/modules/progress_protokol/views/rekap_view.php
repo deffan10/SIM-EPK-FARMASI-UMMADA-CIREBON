@@ -133,3 +133,94 @@ $tahun_sekarang = date('Y');
     </div>
   </div>
 </div>
+
+<div class="space-6"></div>
+
+<div class="row">
+  <div class="col-xs-12">
+    <div class="widget-box">
+      <div class="widget-header widget-header-flat widget-header-small">
+        <h5 class="widget-title">
+          <i class="ace-icon fa fa-bar-chart"></i>
+          Ringkasan
+        </h5>
+      </div>
+
+      <div class="widget-body">
+        <div class="widget-main">
+          <div class="row">
+            <?php for ($pos = 1; $pos <= 5; $pos++) { 
+              if (!empty($summary['penelaah'][$pos])) { 
+            ?>
+            <div class="col-sm-3">
+              <h5 class="header smaller lighter blue">Penelaah <?php echo $pos ?></h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Nama</th>
+                    <th class="center" width="60">Jumlah</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php foreach ($summary['penelaah'][$pos] as $nama => $jumlah) { ?>
+                  <tr>
+                    <td><?php echo $nama ?></td>
+                    <td class="center"><span class="badge badge-info"><?php echo $jumlah ?></span></td>
+                  </tr>
+                  <?php } ?>
+                </tbody>
+              </table>
+            </div>
+            <?php } } ?>
+          </div>
+
+          <div class="row">
+            <?php if (!empty($summary['sekretaris'])) { ?>
+            <div class="col-sm-6">
+              <h5 class="header smaller lighter blue">Sekretaris</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Nama</th>
+                    <th class="center" width="60">Jumlah</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php foreach ($summary['sekretaris'] as $nama => $jumlah) { ?>
+                  <tr>
+                    <td><?php echo $nama ?></td>
+                    <td class="center"><span class="badge badge-info"><?php echo $jumlah ?></span></td>
+                  </tr>
+                  <?php } ?>
+                </tbody>
+              </table>
+            </div>
+            <?php } ?>
+
+            <?php if (!empty($summary['kesekretariatan'])) { ?>
+            <div class="col-sm-6">
+              <h5 class="header smaller lighter blue">Kesekretariatan</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Nama</th>
+                    <th class="center" width="60">Jumlah</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php foreach ($summary['kesekretariatan'] as $nama => $jumlah) { ?>
+                  <tr>
+                    <td><?php echo $nama ?></td>
+                    <td class="center"><span class="badge badge-info"><?php echo $jumlah ?></span></td>
+                  </tr>
+                  <?php } ?>
+                </tbody>
+              </table>
+            </div>
+            <?php } ?>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

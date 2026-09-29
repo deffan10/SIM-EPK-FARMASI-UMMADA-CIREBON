@@ -353,7 +353,8 @@ class Progress_protokol_model extends Core_Model {
         coalesce(atk_ketua.nama, atk_wakil_ketua.nama) as nama_ketua_putusan,
         pa.inserted as tgl_acc_ketua,
         ksp.inserted as tgl_kirim_peneliti,
-        ksp.id_kirim as sudah_kirim
+        ksp.id_kirim as sudah_kirim,
+        atk_ksek.nama as nama_kesekretariatan
       ");
     $this->db->from('tb_ethical_exemption as ee');
     $this->db->join('tb_pep as e', 'e.id_pep = ee.id_pep');
@@ -363,6 +364,7 @@ class Progress_protokol_model extends Core_Model {
     $this->db->join('tb_putusan_awal as pa', 'pa.id_pep = e.id_pep', 'left');
     $this->db->join('tb_anggota_tim_kepk as atk_ketua', 'atk_ketua.id_atk = pa.id_atk_ketua', 'left');
     $this->db->join('tb_anggota_tim_kepk as atk_wakil_ketua', 'atk_wakil_ketua.id_atk = pa.id_atk_wakil_ketua', 'left');
+    $this->db->join('tb_anggota_tim_kepk as atk_ksek', 'atk_ksek.id_atk = ee.id_atk_kesekretariatan', 'left');
     $this->db->join('tb_kirim_surat_ke_peneliti as ksp', "ksp.id_pep = e.id_pep and ksp.jenis_surat = 'Pembebasan Etik'", 'left');
     $this->db->where('p.id_kepk', $id_kepk);
     $this->db->where("ee.tanggal_surat >= '".$start."' and ee.tanggal_surat <= '".$end."'");
@@ -400,6 +402,60 @@ class Progress_protokol_model extends Core_Model {
     $result = $this->db->query($query, array($id_pep, $id_pep))->result_array();
 
     return $result;
+  }
+
+  public function get_data_summary($rekap)
+  {
+    $summary = array(
+      'penelaah' => array(),
+      'sekretaris' => array(),
+      'kesekretariatan' => array()
+    );
+
+    for ($i = 1; $i <= 5; $i++)
+      $summary['penelaah'][$i] = array();
+
+    foreach ($rekap as $row)
+    {
+      // penelaah per posisi
+      for ($i = 0; $i < 5; $i++)
+      {
+        if (isset($row['penelaah'][$i]) && !empty($row['penelaah'][$i]['nama']))
+        {
+          $nama = $row['penelaah'][$i]['nama'];
+          $posisi = $i + 1;
+          if (!isset($summary['penelaah'][$posisi][$nama]))
+            $summary['penelaah'][$posisi][$nama] = 0;
+          $summary['penelaah'][$posisi][$nama]++;
+        }
+      }
+
+      // sekretaris
+      if (!empty($row['nama_sekretaris']))
+      {
+        $nama = $row['nama_sekretaris'];
+        if (!isset($summary['sekretaris'][$nama]))
+          $summary['sekretaris'][$nama] = 0;
+        $summary['sekretaris'][$nama]++;
+      }
+
+      // kesekretariatan
+      if (!empty($row['nama_kesekretariatan']))
+      {
+        $nama = $row['nama_kesekretariatan'];
+        if (!isset($summary['kesekretariatan'][$nama]))
+          $summary['kesekretariatan'][$nama] = 0;
+        $summary['kesekretariatan'][$nama]++;
+      }
+    }
+
+    // urutkan nama ascending
+    for ($i = 1; $i <= 5; $i++)
+      ksort($summary['penelaah'][$i]);
+    ksort($summary['sekretaris']);
+    ksort($summary['kesekretariatan']);
+
+    return $summary;
   }
 
 }
