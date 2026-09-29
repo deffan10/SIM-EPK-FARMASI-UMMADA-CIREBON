@@ -176,7 +176,7 @@ $tahun_sekarang = date('Y');
 
           <div class="row">
             <?php if (!empty($summary['sekretaris'])) { ?>
-            <div class="col-sm-6">
+            <div class="col-sm-4">
               <h5 class="header smaller lighter blue">Sekretaris</h5>
               <table class="table table-bordered table-striped table-condensed">
                 <thead>
@@ -197,8 +197,30 @@ $tahun_sekarang = date('Y');
             </div>
             <?php } ?>
 
+            <?php if (!empty($summary['ketua'])) { ?>
+            <div class="col-sm-4">
+              <h5 class="header smaller lighter blue">Ketua / Wakil Ketua</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Nama</th>
+                    <th class="center" width="60">Jumlah</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php foreach ($summary['ketua'] as $nama => $jumlah) { ?>
+                  <tr>
+                    <td><?php echo $nama ?></td>
+                    <td class="center"><span class="badge badge-info"><?php echo $jumlah ?></span></td>
+                  </tr>
+                  <?php } ?>
+                </tbody>
+              </table>
+            </div>
+            <?php } ?>
+
             <?php if (!empty($summary['kesekretariatan'])) { ?>
-            <div class="col-sm-6">
+            <div class="col-sm-4">
               <h5 class="header smaller lighter blue">Kesekretariatan</h5>
               <table class="table table-bordered table-striped table-condensed">
                 <thead>

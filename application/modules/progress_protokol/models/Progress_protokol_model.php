@@ -409,6 +409,7 @@ class Progress_protokol_model extends Core_Model {
     $summary = array(
       'penelaah' => array(),
       'sekretaris' => array(),
+      'ketua' => array(),
       'kesekretariatan' => array()
     );
 
@@ -439,6 +440,15 @@ class Progress_protokol_model extends Core_Model {
         $summary['sekretaris'][$nama]++;
       }
 
+      // ketua (ketua atau wakil ketua yang meng-acc putusan awal)
+      if (!empty($row['nama_ketua_putusan']))
+      {
+        $nama = $row['nama_ketua_putusan'];
+        if (!isset($summary['ketua'][$nama]))
+          $summary['ketua'][$nama] = 0;
+        $summary['ketua'][$nama]++;
+      }
+
       // kesekretariatan
       if (!empty($row['nama_kesekretariatan']))
       {
@@ -453,6 +463,7 @@ class Progress_protokol_model extends Core_Model {
     for ($i = 1; $i <= 5; $i++)
       ksort($summary['penelaah'][$i]);
     ksort($summary['sekretaris']);
+    ksort($summary['ketua']);
     ksort($summary['kesekretariatan']);
 
     return $summary;
