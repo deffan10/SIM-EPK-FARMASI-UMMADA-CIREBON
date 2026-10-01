@@ -504,16 +504,6 @@ class Progress_protokol_model extends Core_Model {
     return $result;
   }
 
-  function get_data_ttd_ketua()
-  {
-    $this->db->select('tk.file_name');
-    $this->db->from('tb_tandatangan_ketua as tk');
-    $this->db->where('tk.id_kepk', $this->session->userdata('id_kepk'));
-    $result = $this->db->get()->row_array();
-
-    return $result;
-  }
-
   function get_data_pembuat_laporan()
   {
     $this->db->select('a.nama, a.nomor');

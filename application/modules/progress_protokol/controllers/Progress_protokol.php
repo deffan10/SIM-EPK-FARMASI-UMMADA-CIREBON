@@ -92,7 +92,6 @@ class Progress_protokol extends Userpage_Controller {
     $summary = $this->data_model->get_data_summary($rekap);
     $kategori = $this->data_model->get_data_rekap_kategori($rekap);
     $kop = $this->data_model->get_data_kop_surat();
-    $ttd = $this->data_model->get_data_ttd_ketua();
     $ketua = $this->data_model->get_data_ketua_kepk();
 
     $this->load->library('Pdf');
@@ -115,11 +114,16 @@ class Progress_protokol extends Userpage_Controller {
     $pdf->SetFont('times', '', 10);
     $pdf->AddPage();
 
-    $page_h = $pdf->getPageHeight();
+    // batas bawah area isi. SetAutoPageBreak memakai PDF_MARGIN_BOTTOM, jadi
+    // harus pakai nilai yang sama, kalau tidak blok bisa keluar dari area cetak.
+    $limit_y = $pdf->getPageHeight() - PDF_MARGIN_BOTTOM;
 
-    // pindah halaman kalau sisa tinggi tidak cukup, supaya judul/tabel tidak terpotong
-    $need = function($tinggi) use ($pdf, $page_h) {
-      if (($page_h - $pdf->getY()) < $tinggi)
+    // tinggi satu baris tabel (mm), untuk estimasi tinggi blok
+    $row_h = 7.5;
+
+    // pindah halaman kalau sisa tinggi tidak cukup, supaya judul dan tabel tidak terpotong
+    $need = function($tinggi) use ($pdf, $limit_y) {
+      if (($limit_y - $pdf->getY()) < ($tinggi + 2))
       {
         $pdf->AddPage();
         return true;
@@ -145,10 +149,10 @@ class Progress_protokol extends Userpage_Controller {
 
     $pdf->writeHTML($html, true, false, true, false, '');
 
-    // Ringkasan kategori
-    $need(75);
+    // Ringkasan kategori (1 header + 8 baris)
+    $need(9 * $row_h + 8);
     $html = '<p><strong>Ringkasan</strong></p>';
-    $html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
+    $html .= '<table border="1" cellpadding="4" cellspacing="0" width="100%">';
     $html .= '<tr><td width="70%">Jumlah Judul yang Memperoleh Pembebasan Etik</td><td width="30%" align="center">'.count($rekap).'</td></tr>';
     $html .= '<tr><td colspan="2"><strong>Kategori Penelitian</strong></td></tr>';
     $html .= '<tr><td>Observasional</td><td align="center">'.$kategori['jenis_penelitian'][1].'</td></tr>';
@@ -176,26 +180,29 @@ class Progress_protokol extends Userpage_Controller {
 
     if (!empty($rows_tugas))
     {
-      // judul dan tabel tidak boleh terpisah antar halaman
-      $need(35 + count($rows_tugas) * 12);
+      $need(3 * $row_h + 8);
+      $pdf->writeHTML('<p><strong>Ringkasan Pembagian Tugas</strong></p>', true, false, true, false, '');
 
-      $html = '<p><strong>Ringkasan Pembagian Tugas</strong></p>';
-
+      // tiap tabel kecil ditulis terpisah supaya label + tabel tidak terpisah antar halaman
       foreach ($rows_tugas as $label => $items)
       {
-        $html .= '<p style="margin-bottom:2px;">'.$label.'</p>';
+        $need((count($items) + 2) * $row_h + 6);
+
+        $html = '<p style="margin-bottom:2px;">'.$label.'</p>';
         $html .= '<table border="1" cellpadding="4" cellspacing="0" width="100%">';
         $html .= '<tr align="center"><th width="70%">Nama</th><th width="30%">Jumlah</th></tr>';
         foreach ($items as $nama => $jumlah)
           $html .= '<tr><td>'.$nama.'</td><td align="center">'.$jumlah.'</td></tr>';
         $html .= '</table>';
-      }
 
-      $pdf->writeHTML($html, true, false, true, false, '');
+        $pdf->writeHTML($html, true, false, true, false, '');
+      }
     }
 
-    // Tabel detail, judul + header tabel selalu ikut ke halaman yang sama
-    $need(40);
+    // Tabel detail: judul + header tabel + 3 baris data harus muat di satu halaman,
+    // supaya tabel tidak mulai di kaki halaman. Sisa baris otomatis pindah halaman
+    // dan header tabel diulang karena memakai <thead>.
+    $need(4 * $row_h + 14);
 
     $html = '<p><strong>Daftar Judul Penelitian</strong></p>';
     $html .= '<table border="1" cellpadding="4" cellspacing="0" width="100%">';
@@ -222,12 +229,7 @@ class Progress_protokol extends Userpage_Controller {
     $pdf->writeHTML($html, true, false, true, false, '');
 
     // Tanda tangan
-    $need(70);
-
-    if (isset($ttd['file_name']) && $ttd['file_name'] != '')
-      $ttd_img = '<img src="./uploads/'.$ttd['file_name'].'" height="70">';
-    else
-      $ttd_img = '<br/><br/><br/><br/><br/>';
+    $need(4 * $row_h + 10);
 
     $tgl = nama_bulan(date('m')).' '.date('Y');
     $pembuat = $this->data_model->get_data_pembuat_laporan();
@@ -243,10 +245,6 @@ class Progress_protokol extends Userpage_Controller {
     $html .= '<tr>';
     $html .= '<td width="50%" align="center"><br/><br/><br/></td>';
     $html .= '<td width="50%" align="center"><br/>'.$tgl.'</td>';
-    $html .= '</tr>';
-    $html .= '<tr>';
-    $html .= '<td width="50%" align="center">'.$ttd_img.'</td>';
-    $html .= '<td width="50%" align="center">'.$ttd_img.'</td>';
     $html .= '</tr>';
     $html .= '<tr>';
     $html .= '<td width="50%" align="center"><u>'.$nama_kesekretariatan.'</u></td>';
