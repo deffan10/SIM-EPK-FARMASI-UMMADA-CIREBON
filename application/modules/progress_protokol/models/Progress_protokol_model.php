@@ -504,4 +504,43 @@ class Progress_protokol_model extends Core_Model {
     return $result;
   }
 
+  function get_data_ttd_ketua()
+  {
+    $this->db->select('tk.file_name');
+    $this->db->from('tb_tandatangan_ketua as tk');
+    $this->db->where('tk.id_kepk', $this->session->userdata('id_kepk'));
+    $result = $this->db->get()->row_array();
+
+    return $result;
+  }
+
+  function get_data_pembuat_laporan()
+  {
+    $this->db->select('a.nama, a.nomor');
+    $this->db->from('tb_struktur_tim_kepk as s');
+    $this->db->join('tb_users as u', 'u.id_stk = s.id_stk');
+    $this->db->join('tb_anggota_tim_kepk as a', 'a.id_atk = s.id_atk');
+    $this->db->where('u.id_user', $this->session->userdata('id_user_'.APPAUTH));
+    $result = $this->db->get()->row_array();
+
+    if (empty($result))
+      $result = array('nama' => $this->session->userdata('nama_user_'.APPAUTH));
+
+    return $result;
+  }
+
+  function get_data_ketua_kepk()
+  {
+    $this->db->select('a.nama, a.nomor, a.nik');
+    $this->db->from('tb_anggota_tim_kepk as a');
+    $this->db->join('tb_struktur_tim_kepk as s', 's.id_atk = a.id_atk');
+    $this->db->join('tb_tim_kepk as tk', 'tk.id_tim_kepk = s.id_tim_kepk');
+    $this->db->where('s.jabatan', 1);
+    $this->db->where('tk.id_kepk', $this->session->userdata('id_kepk_tim'));
+    $this->db->where('tk.aktif', 1);
+    $result = $this->db->get()->row_array();
+
+    return $result;
+  }
+
 }

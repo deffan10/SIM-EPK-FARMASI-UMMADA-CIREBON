@@ -92,6 +92,8 @@ class Progress_protokol extends Userpage_Controller {
     $summary = $this->data_model->get_data_summary($rekap);
     $kategori = $this->data_model->get_data_rekap_kategori($rekap);
     $kop = $this->data_model->get_data_kop_surat();
+    $ttd = $this->data_model->get_data_ttd_ketua();
+    $ketua = $this->data_model->get_data_ketua_kepk();
 
     $this->load->library('Pdf');
     $pdf = new Pdf(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
@@ -113,28 +115,40 @@ class Progress_protokol extends Userpage_Controller {
     $pdf->SetFont('times', '', 10);
     $pdf->AddPage();
 
+    $page_h = $pdf->getPageHeight();
+
+    // pindah halaman kalau sisa tinggi tidak cukup, supaya judul/tabel tidak terpotong
+    $need = function($tinggi) use ($pdf, $page_h) {
+      if (($page_h - $pdf->getY()) < $tinggi)
+      {
+        $pdf->AddPage();
+        return true;
+      }
+      return false;
+    };
+
     // Kop surat
     if (isset($kop['file_name']) && file_exists('./uploads/'.$kop['file_name']))
       $pdf->writeHTMLCell(210, '', 0, 5, '<img src="./uploads/'.$kop['file_name'].'">', 0, 1, false, true, 'L', false);
+
+    $periode = nama_bulan(str_pad($bulan_awal, 2, '0', STR_PAD_LEFT)).' '.$tahun_awal.' - '.nama_bulan(str_pad($bulan_akhir, 2, '0', STR_PAD_LEFT)).' '.$tahun_akhir;
 
     // Judul
     $html = '<p align="center" style="font-size: 14pt; font-weight: bold;">LAPORAN REKAP PEMBEBASAN ETIK</p>';
     $html .= '<p align="center" style="font-size: 12pt;">'.strtoupper($this->session->userdata('nama_kepk')).'</p>';
     $html .= '<br/>';
-
-    $periode = nama_bulan(str_pad($bulan_awal, 2, '0', STR_PAD_LEFT)).' '.$tahun_awal.' - '.nama_bulan(str_pad($bulan_akhir, 2, '0', STR_PAD_LEFT)).' '.$tahun_akhir;
     $html .= '<p align="center">Periode: '.$periode.'</p>';
     $html .= '<br/>';
 
     // Teks pembuka
-    $html .= '<p align="justify">Berikut ini adalah laporan rekap pembebasan etik (exempted) yang diterbitkan selama periode '.$periode.'. Laporan ini memuat ringkasan mengenai jumlah judul penelitian yang memperoleh pembebasan etik beserta kategori dan asal pengusulnya.</p>';
-    $html .= '<br/>';
+    $html .= '<p align="justify">Berikut ini adalah laporan rekap pembebasan etik (exempted) yang diterbitkan selama periode '.$periode.'. Laporan ini memuat ringkasan mengenai jumlah judul penelitian yang memperoleh pembebasan etik beserta kategori penelitian, asal pengusul, serta pembagian tugas dalam proses penilaiannya.</p>';
 
     $pdf->writeHTML($html, true, false, true, false, '');
 
     // Ringkasan kategori
-    $html = '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
-    $html .= '<tr><th colspan="2" align="center">Ringkasan</th></tr>';
+    $need(75);
+    $html = '<p><strong>Ringkasan</strong></p>';
+    $html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
     $html .= '<tr><td width="70%">Jumlah Judul yang Memperoleh Pembebasan Etik</td><td width="30%" align="center">'.count($rekap).'</td></tr>';
     $html .= '<tr><td colspan="2"><strong>Kategori Penelitian</strong></td></tr>';
     $html .= '<tr><td>Observasional</td><td align="center">'.$kategori['jenis_penelitian'][1].'</td></tr>';
@@ -144,49 +158,50 @@ class Progress_protokol extends Userpage_Controller {
     $html .= '<tr><td>Internal</td><td align="center">'.$kategori['asal_pengusul'][1].'</td></tr>';
     $html .= '<tr><td>Eksternal</td><td align="center">'.$kategori['asal_pengusul'][2].'</td></tr>';
     $html .= '</table>';
-    $html .= '<br/>';
 
     $pdf->writeHTML($html, true, false, true, false, '');
 
     // Ringkasan pembagian tugas
-    $html = '';
-    $rows_tugas = array(
-      'Sekretaris' => $summary['sekretaris'],
-      'Ketua / Wakil Ketua' => $summary['ketua'],
-      'Kesekretariatan' => $summary['kesekretariatan'],
-    );
-
-    foreach ($rows_tugas as $label => $items)
-    {
-      if (empty($items)) continue;
-      $html .= '<p><strong>'.$label.'</strong></p>';
-      $html .= '<table border="1" cellpadding="4" cellspacing="0" width="100%">';
-      $html .= '<tr align="center"><th width="70%">Nama</th><th width="30%">Jumlah</th></tr>';
-      foreach ($items as $nama => $jumlah)
-        $html .= '<tr><td>'.$nama.'</td><td align="center">'.$jumlah.'</td></tr>';
-      $html .= '</table><br/>';
-    }
-
+    $rows_tugas = array();
     for ($pos = 1; $pos <= 5; $pos++)
+      if (!empty($summary['penelaah'][$pos]))
+        $rows_tugas['Penelaah '.$pos] = $summary['penelaah'][$pos];
+
+    if (!empty($summary['sekretaris']))
+      $rows_tugas['Sekretaris'] = $summary['sekretaris'];
+    if (!empty($summary['ketua']))
+      $rows_tugas['Ketua / Wakil Ketua'] = $summary['ketua'];
+    if (!empty($summary['kesekretariatan']))
+      $rows_tugas['Kesekretariatan'] = $summary['kesekretariatan'];
+
+    if (!empty($rows_tugas))
     {
-      if (empty($summary['penelaah'][$pos])) continue;
-      $html .= '<p><strong>Penelaah '.$pos.'</strong></p>';
-      $html .= '<table border="1" cellpadding="4" cellspacing="0" width="100%">';
-      $html .= '<tr align="center"><th width="70%">Nama</th><th width="30%">Jumlah</th></tr>';
-      foreach ($summary['penelaah'][$pos] as $nama => $jumlah)
-        $html .= '<tr><td>'.$nama.'</td><td align="center">'.$jumlah.'</td></tr>';
-      $html .= '</table><br/>';
+      // judul dan tabel tidak boleh terpisah antar halaman
+      $need(35 + count($rows_tugas) * 12);
+
+      $html = '<p><strong>Ringkasan Pembagian Tugas</strong></p>';
+
+      foreach ($rows_tugas as $label => $items)
+      {
+        $html .= '<p style="margin-bottom:2px;">'.$label.'</p>';
+        $html .= '<table border="1" cellpadding="4" cellspacing="0" width="100%">';
+        $html .= '<tr align="center"><th width="70%">Nama</th><th width="30%">Jumlah</th></tr>';
+        foreach ($items as $nama => $jumlah)
+          $html .= '<tr><td>'.$nama.'</td><td align="center">'.$jumlah.'</td></tr>';
+        $html .= '</table>';
+      }
+
+      $pdf->writeHTML($html, true, false, true, false, '');
     }
 
-    if ($html !== '')
-      $pdf->writeHTML($html, true, false, true, false, '');
+    // Tabel detail, judul + header tabel selalu ikut ke halaman yang sama
+    $need(40);
 
-    // Tabel detail ringkas
-    $html = '<table border="1" cellpadding="4" cellspacing="0" width="100%">';
-    $html .= '<thead>';
-    $html .= '<tr align="center"><th width="5%">No</th><th width="20%">No. Protokol</th><th width="25%">Nama Peneliti</th><th width="50%">Judul Penelitian</th></tr>';
-    $html .= '</thead>';
+    $html = '<p><strong>Daftar Judul Penelitian</strong></p>';
+    $html .= '<table border="1" cellpadding="4" cellspacing="0" width="100%">';
+    $html .= '<thead><tr align="center"><th width="6%">No</th><th width="20%">No. Protokol</th><th width="24%">Nama Peneliti</th><th width="50%">Judul Penelitian</th></tr></thead>';
     $html .= '<tbody>';
+
     if (empty($rekap)) {
       $html .= '<tr><td colspan="4" align="center">Tidak ada data</td></tr>';
     } else {
@@ -200,7 +215,47 @@ class Progress_protokol extends Userpage_Controller {
         $html .= '</tr>';
       }
     }
+
     $html .= '</tbody>';
+    $html .= '</table>';
+
+    $pdf->writeHTML($html, true, false, true, false, '');
+
+    // Tanda tangan
+    $need(70);
+
+    if (isset($ttd['file_name']) && $ttd['file_name'] != '')
+      $ttd_img = '<img src="./uploads/'.$ttd['file_name'].'" height="70">';
+    else
+      $ttd_img = '<br/><br/><br/><br/><br/>';
+
+    $tgl = nama_bulan(date('m')).' '.date('Y');
+    $pembuat = $this->data_model->get_data_pembuat_laporan();
+    $nama_kesekretariatan = isset($pembuat['nama']) ? $pembuat['nama'] : '';
+    $jabatan_kesekretariatan = $this->session->userdata('nama_group_'.APPAUTH);
+    if (empty($jabatan_kesekretariatan)) $jabatan_kesekretariatan = 'Kesekretariatan KEPK';
+
+    $html = '<table border="0" cellpadding="0" cellspacing="0">';
+    $html .= '<tr>';
+    $html .= '<td width="50%" align="center">Yang membuat,</td>';
+    $html .= '<td width="50%" align="center">Dietahui,</td>';
+    $html .= '</tr>';
+    $html .= '<tr>';
+    $html .= '<td width="50%" align="center"><br/><br/><br/></td>';
+    $html .= '<td width="50%" align="center"><br/>'.$tgl.'</td>';
+    $html .= '</tr>';
+    $html .= '<tr>';
+    $html .= '<td width="50%" align="center">'.$ttd_img.'</td>';
+    $html .= '<td width="50%" align="center">'.$ttd_img.'</td>';
+    $html .= '</tr>';
+    $html .= '<tr>';
+    $html .= '<td width="50%" align="center"><u>'.$nama_kesekretariatan.'</u></td>';
+    $html .= '<td width="50%" align="center"><u>'.(isset($ketua['nama']) ? $ketua['nama'] : '-').'</u></td>';
+    $html .= '</tr>';
+    $html .= '<tr>';
+    $html .= '<td width="50%" align="center">'.$jabatan_kesekretariatan.'</td>';
+    $html .= '<td width="50%" align="center">Ketua KEPK</td>';
+    $html .= '</tr>';
     $html .= '</table>';
 
     $pdf->writeHTML($html, true, false, true, false, '');
