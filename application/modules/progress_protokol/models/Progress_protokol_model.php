@@ -346,6 +346,9 @@ class Progress_protokol_model extends Core_Model {
         p.no_protokol,
         p.nama_ketua,
         p.judul,
+        p.jenis_penelitian,
+        p.asal_pengusul,
+        k.nama_kepk,
         ee.id_pep,
         ee.tanggal_surat as tgl_disahkan,
         atk_resume.nama as nama_sekretaris,
@@ -359,6 +362,7 @@ class Progress_protokol_model extends Core_Model {
     $this->db->from('tb_ethical_exemption as ee');
     $this->db->join('tb_pep as e', 'e.id_pep = ee.id_pep');
     $this->db->join('tb_pengajuan as p', 'p.id_pengajuan = e.id_pengajuan');
+    $this->db->join('tb_kepk as k', 'k.id_kepk = p.id_kepk');
     $this->db->join('tb_resume as r', 'r.id_pep = e.id_pep', 'left');
     $this->db->join('tb_anggota_tim_kepk as atk_resume', 'atk_resume.id_atk = r.id_atk_sekretaris', 'left');
     $this->db->join('tb_putusan_awal as pa', 'pa.id_pep = e.id_pep', 'left');
@@ -467,6 +471,37 @@ class Progress_protokol_model extends Core_Model {
     ksort($summary['kesekretariatan']);
 
     return $summary;
+  }
+
+  public function get_data_rekap_kategori($rekap)
+  {
+    $kategori = array(
+      'jenis_penelitian' => array(1 => 0, 2 => 0, 3 => 0),
+      'asal_pengusul' => array(1 => 0, 2 => 0)
+    );
+
+    foreach ($rekap as $row)
+    {
+      $jp = (int) $row['jenis_penelitian'];
+      if (isset($kategori['jenis_penelitian'][$jp]))
+        $kategori['jenis_penelitian'][$jp]++;
+
+      $ap = (int) $row['asal_pengusul'];
+      if (isset($kategori['asal_pengusul'][$ap]))
+        $kategori['asal_pengusul'][$ap]++;
+    }
+
+    return $kategori;
+  }
+
+  function get_data_kop_surat()
+  {
+    $this->db->select('ks.file_name');
+    $this->db->from('tb_kop_surat as ks');
+    $this->db->where('ks.id_kepk', $this->session->userdata('id_kepk'));
+    $result = $this->db->get()->row_array();
+
+    return $result;
   }
 
 }

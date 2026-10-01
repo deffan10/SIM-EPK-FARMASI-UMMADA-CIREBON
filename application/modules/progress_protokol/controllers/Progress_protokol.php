@@ -69,12 +69,143 @@ class Progress_protokol extends Userpage_Controller {
     $data['tahun_akhir'] = $tahun_akhir;
     $data['rekap'] = $this->data_model->get_data_rekap($bulan_awal, $tahun_awal, $bulan_akhir, $tahun_akhir);
     $data['summary'] = $this->data_model->get_data_summary($data['rekap']);
+    $data['kategori'] = $this->data_model->get_data_rekap_kategori($data['rekap']);
 
     $data['css_content'] = 'rekap_view_css';
     $data['main_content'] = 'rekap_view';
     $data['js_content'] = 'rekap_view_js';
 
     $this->load->view('layout/template', $data);
+  }
+
+  public function cetak_rekap($bulan_awal=0, $tahun_awal=0, $bulan_akhir=0, $tahun_akhir=0)
+  {
+    if ($this->session->userdata('id_group_'.APPAUTH) != 5)
+      show_error('Anda tidak memiliki akses ke halaman ini.');
+
+    $bulan_awal = $bulan_awal ? $bulan_awal : date('n');
+    $tahun_awal = $tahun_awal ? $tahun_awal : date('Y');
+    $bulan_akhir = $bulan_akhir ? $bulan_akhir : date('n');
+    $tahun_akhir = $tahun_akhir ? $tahun_akhir : date('Y');
+
+    $rekap = $this->data_model->get_data_rekap($bulan_awal, $tahun_awal, $bulan_akhir, $tahun_akhir);
+    $summary = $this->data_model->get_data_summary($rekap);
+    $kategori = $this->data_model->get_data_rekap_kategori($rekap);
+    $kop = $this->data_model->get_data_kop_surat();
+
+    $this->load->library('Pdf');
+    $pdf = new Pdf(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+
+    $pdf->SetCreator(PDF_CREATOR);
+    $pdf->SetAuthor('E-Protokol');
+    $pdf->SetTitle('Rekap Pembebasan Etik');
+    $pdf->SetSubject('Rekap Pembebasan Etik');
+
+    $pdf->setPrintHeader(false);
+    $pdf->setPrintFooter(false);
+    $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+    $pdf->SetMargins(PDF_MARGIN_LEFT, 10, PDF_MARGIN_RIGHT);
+    $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+    $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+    $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+    $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+
+    $pdf->SetFont('times', '', 10);
+    $pdf->AddPage();
+
+    // Kop surat
+    if (isset($kop['file_name']) && file_exists('./uploads/'.$kop['file_name']))
+      $pdf->writeHTMLCell(210, '', 0, 5, '<img src="./uploads/'.$kop['file_name'].'">', 0, 1, false, true, 'L', false);
+
+    // Judul
+    $html = '<p align="center" style="font-size: 14pt; font-weight: bold;">LAPORAN REKAP PEMBEBASAN ETIK</p>';
+    $html .= '<p align="center" style="font-size: 12pt;">'.strtoupper($this->session->userdata('nama_kepk')).'</p>';
+    $html .= '<br/>';
+
+    $periode = nama_bulan(str_pad($bulan_awal, 2, '0', STR_PAD_LEFT)).' '.$tahun_awal.' - '.nama_bulan(str_pad($bulan_akhir, 2, '0', STR_PAD_LEFT)).' '.$tahun_akhir;
+    $html .= '<p align="center">Periode: '.$periode.'</p>';
+    $html .= '<br/>';
+
+    // Teks pembuka
+    $html .= '<p align="justify">Berikut ini adalah laporan rekap pembebasan etik (exempted) yang diterbitkan selama periode '.$periode.'. Laporan ini memuat ringkasan mengenai jumlah judul penelitian yang memperoleh pembebasan etik beserta kategori dan asal pengusulnya.</p>';
+    $html .= '<br/>';
+
+    $pdf->writeHTML($html, true, false, true, false, '');
+
+    // Ringkasan kategori
+    $html = '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
+    $html .= '<tr><th colspan="2" align="center">Ringkasan</th></tr>';
+    $html .= '<tr><td width="70%">Jumlah Judul yang Memperoleh Pembebasan Etik</td><td width="30%" align="center">'.count($rekap).'</td></tr>';
+    $html .= '<tr><td colspan="2"><strong>Kategori Penelitian</strong></td></tr>';
+    $html .= '<tr><td>Observasional</td><td align="center">'.$kategori['jenis_penelitian'][1].'</td></tr>';
+    $html .= '<tr><td>Intervensi</td><td align="center">'.$kategori['jenis_penelitian'][2].'</td></tr>';
+    $html .= '<tr><td>Uji Klinik</td><td align="center">'.$kategori['jenis_penelitian'][3].'</td></tr>';
+    $html .= '<tr><td colspan="2"><strong>Asal Pengusul</strong></td></tr>';
+    $html .= '<tr><td>Internal</td><td align="center">'.$kategori['asal_pengusul'][1].'</td></tr>';
+    $html .= '<tr><td>Eksternal</td><td align="center">'.$kategori['asal_pengusul'][2].'</td></tr>';
+    $html .= '</table>';
+    $html .= '<br/>';
+
+    $pdf->writeHTML($html, true, false, true, false, '');
+
+    // Ringkasan pembagian tugas
+    $html = '';
+    $rows_tugas = array(
+      'Sekretaris' => $summary['sekretaris'],
+      'Ketua / Wakil Ketua' => $summary['ketua'],
+      'Kesekretariatan' => $summary['kesekretariatan'],
+    );
+
+    foreach ($rows_tugas as $label => $items)
+    {
+      if (empty($items)) continue;
+      $html .= '<p><strong>'.$label.'</strong></p>';
+      $html .= '<table border="1" cellpadding="4" cellspacing="0" width="100%">';
+      $html .= '<tr align="center"><th width="70%">Nama</th><th width="30%">Jumlah</th></tr>';
+      foreach ($items as $nama => $jumlah)
+        $html .= '<tr><td>'.$nama.'</td><td align="center">'.$jumlah.'</td></tr>';
+      $html .= '</table><br/>';
+    }
+
+    for ($pos = 1; $pos <= 5; $pos++)
+    {
+      if (empty($summary['penelaah'][$pos])) continue;
+      $html .= '<p><strong>Penelaah '.$pos.'</strong></p>';
+      $html .= '<table border="1" cellpadding="4" cellspacing="0" width="100%">';
+      $html .= '<tr align="center"><th width="70%">Nama</th><th width="30%">Jumlah</th></tr>';
+      foreach ($summary['penelaah'][$pos] as $nama => $jumlah)
+        $html .= '<tr><td>'.$nama.'</td><td align="center">'.$jumlah.'</td></tr>';
+      $html .= '</table><br/>';
+    }
+
+    if ($html !== '')
+      $pdf->writeHTML($html, true, false, true, false, '');
+
+    // Tabel detail ringkas
+    $html = '<table border="1" cellpadding="4" cellspacing="0" width="100%">';
+    $html .= '<thead>';
+    $html .= '<tr align="center"><th width="5%">No</th><th width="20%">No. Protokol</th><th width="25%">Nama Peneliti</th><th width="50%">Judul Penelitian</th></tr>';
+    $html .= '</thead>';
+    $html .= '<tbody>';
+    if (empty($rekap)) {
+      $html .= '<tr><td colspan="4" align="center">Tidak ada data</td></tr>';
+    } else {
+      $no = 1;
+      foreach ($rekap as $row) {
+        $html .= '<tr>';
+        $html .= '<td align="center">'.$no++.'</td>';
+        $html .= '<td>'.$row['no_protokol'].'</td>';
+        $html .= '<td>'.$row['nama_ketua'].'</td>';
+        $html .= '<td>'.$row['judul'].'</td>';
+        $html .= '</tr>';
+      }
+    }
+    $html .= '</tbody>';
+    $html .= '</table>';
+
+    $pdf->writeHTML($html, true, false, true, false, '');
+
+    $pdf->Output('rekap-pembebasan-etik.pdf', 'I');
   }
 
   function get_daftar()

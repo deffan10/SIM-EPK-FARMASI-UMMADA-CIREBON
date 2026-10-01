@@ -49,6 +49,11 @@ $tahun_sekarang = date('Y');
               <i class="ace-icon fa fa-search bigger-110"></i>
               Tampilkan
             </button>
+
+            <a href="<?php echo base_url()?>progress_protokol/cetak_rekap/<?php echo $bulan_awal.'/'.$tahun_awal.'/'.$bulan_akhir.'/'.$tahun_akhir ?>" target="_blank" class="btn btn-sm btn-success">
+              <i class="ace-icon fa fa-file-pdf-o bigger-110"></i>
+              Cetak PDF
+            </a>
           </form>
         </div>
       </div>
